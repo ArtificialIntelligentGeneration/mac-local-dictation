@@ -1,48 +1,48 @@
 # Mac Local Dictation (Free SuperWhisper Alternative)
 
-🎁 **Подарок сообществу:** Это полностью бесплатная, open-source альтернатива платным приложениям для диктовки по подписке (типа SuperWhisper). Пользуйтесь бесплатно навсегда! Отлично распознает рунглиш и работает без интернета.
+🎁 **A Gift to the Community:** This is a completely free, open-source alternative to paid, subscription-based dictation apps (like SuperWhisper). Use it for free, forever! It excellently recognizes mixed languages (e.g., Runglish) and works entirely offline.
 
-## 🤖 AI-Friendly (Установка через Агентов)
-Этот репозиторий спроектирован для "ленивой" установки через ИИ-агентов (Cursor, Windsurf, Claude Code, Gemini CLI, Aider и т.д.). 
-Вам не нужно разбираться в коде или командах. Просто скачайте репозиторий, откройте его в любимом ИИ-редакторе и напишите промпт:
+## 🤖 AI-Friendly (Agent-Driven Installation)
+This repository is designed for "lazy" installation via AI agents (Cursor, Windsurf, Claude Code, Gemini CLI, Aider, etc.).
+You don't need to understand the code or run terminal commands manually. Just clone the repo, open it in your favorite AI IDE, and give it the prompt:
 
-> *"Установи и запусти это приложение для диктовки"*
+> *"Install and run this dictation app."*
 
-В проекте лежат жесткие стандартизированные инструкции (`.cursorrules`, `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`). Ваш агент сам прочитает их, правильно скомпилирует Swift-хелпер, настроит фоновый процесс и, самое главное, **не сломает** хрупкие права macOS Accessibility, попытавшись "улучшить" код.
+The project contains strict, standardized agent instructions (`.cursorrules`, `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`). Your agent will read them, correctly compile the Swift helper, set up the background process, and most importantly, **will not break** the fragile macOS Accessibility permissions by trying to "improve" the code.
 
-## Особенности
-- **Локально и приватно**: Никакие данные не уходят в облако (Whisper работает на Apple Silicon GPU).
-- **Hold-to-Talk или Toggle**: Зажмите `Cmd + D` (или нажмите дважды), надиктуйте текст и отпустите. Текст сам напечатается в активном окне.
-- **Нативный ввод Swift**: Приложение использует нативный `CGEvent` macOS для эмуляции нажатий клавиш, минуя буфер обмена. Это позволяет использовать диктовку там, где `Cmd+V` заблокирован или работает криво.
-- **Защита от MLX Metal OOM**: Встроен обход известного бага `SIGABRT` в старых версиях MLX. Память GPU принудительно очищается (`mlx.core.clear_cache()`) после каждой фразы.
+## Features
+- **Local & Private**: No data ever goes to the cloud (Whisper runs locally on the Apple Silicon GPU).
+- **Hold-to-Talk or Toggle**: Hold `Cmd + D` (or double-press), dictate your text, and release. The text is automatically typed into your active window.
+- **Native Swift Injection**: The app uses native macOS `CGEvent` to emulate keystrokes, bypassing the clipboard. This allows dictation to work smoothly even in input fields where `Cmd+V` is blocked or buggy.
+- **MLX Metal OOM Protection**: Includes a built-in workaround for the known `SIGABRT` bug in older MLX versions. GPU memory is forcefully cleared (`mlx.core.clear_cache()`) after every transcribed phrase to prevent crashes.
 
-## 🏗 Архитектура и Безопасность (Security Audit Notes)
-Приложение создавалось для личного использования. Недавний аудит безопасности выявил следующие архитектурные особенности, о которых стоит знать:
-- **Использование `/tmp`**: Скомпилированный Swift-хелпер (`paste_helper_type`) и временные аудиофайлы (`hs_dictation.wav`) сохраняются в системную директорию `/tmp`. Это сделано для максимальной скорости, но папка доступна другим локальным процессам и очищается при перезагрузке Mac.
-- **Что это значит**: Если вы перезагрузили компьютер, вам нужно будет просто запустить скрипт заново (или настроить Автозагрузку). При желании, вы можете форкнуть репозиторий и перенести эти файлы в защищенную директорию (sandbox).
+## 🏗 Architecture & Security (Audit Notes)
+This app was originally built for personal use. A recent security audit highlighted the following architectural choices you should be aware of:
+- **Use of `/tmp`**: The compiled Swift helper (`paste_helper_type`) and temporary audio files (`hs_dictation.wav`) are stored in the system's `/tmp` directory. This ensures maximum I/O speed, but `/tmp` is accessible to other local processes and is wiped when the Mac restarts.
+- **What this means**: If you reboot your computer, you will need to restart the script (or set up a Login Item/auto-start script). If you have strict local security requirements, feel free to fork the repo and move these temporary files into a secure application sandbox.
 
-## Требования
-- Mac на Apple Silicon (M1/M2/M3/M4 и т.д.)
+## Requirements
+- Mac with Apple Silicon (M1/M2/M3/M4, etc.)
 - Python 3.9+
-- Установленные `ffmpeg` и `sox` (для записи звука: `brew install sox`)
+- Installed `ffmpeg` and `sox` (for audio recording: `brew install sox`)
 
-## Ручная установка (Без ИИ-Агента)
-1. Склонируйте репозиторий:
+## Manual Installation (Without an AI Agent)
+1. Clone the repository:
    ```bash
    git clone https://github.com/ArtificialIntelligentGeneration/mac-local-dictation.git
    cd mac-local-dictation
    ```
-2. Запустите скрипт установки (скомпилирует Swift-хелпер и установит PIP-пакеты):
+2. Run the install script (compiles the Swift helper and installs PIP packages):
    ```bash
    ./build_and_install.sh
    ```
-3. Запустите приложение в фоне:
+3. Run the app in the background:
    ```bash
    nohup python3 DictationApp.py > /dev/null 2>&1 &
    ```
 
-## Важно: Права Accessibility (Универсальный доступ)
-Для того чтобы приложение могло перехватывать глобальное нажатие `Cmd+D` и само печатать текст, ему нужны права Универсального доступа macOS.
-1. Зайдите в **Системные настройки (System Settings)** -> **Конфиденциальность и безопасность (Privacy & Security)** -> **Универсальный доступ (Accessibility)**.
-2. Дайте разрешение вашему Терминалу (или Python).
-3. **ВНИМАНИЕ:** Права жестко привязаны к подписи бинарного файла. Если агент или вы измените файл `DictationApp.py`, macOS молча отзовет права. **Решение:** в настройках удалите приложение (кнопкой `-`) и добавьте заново (кнопкой `+`).
+## Crucial: Accessibility Permissions
+For the app to intercept the global `Cmd+D` hotkey and type text autonomously, it requires macOS Accessibility permissions.
+1. Go to **System Settings** -> **Privacy & Security** -> **Accessibility**.
+2. Grant permission to your Terminal (or Python).
+3. **WARNING:** Permissions are strictly tied to the binary's signature. If you or an AI agent modify the `DictationApp.py` file, macOS will silently revoke typing permissions. **Fix:** Remove the app from the Accessibility list (using the `-` button) and add it back (using the `+` button).

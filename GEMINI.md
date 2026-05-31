@@ -1,20 +1,20 @@
-# Правила для агента (DictationApp)
+# Agent Rules (DictationApp)
 
-**КРИТИЧЕСКИ ВАЖНО: НИКОГДА НЕ ИЗМЕНЯЙ И НЕ ПЕРЕПИСЫВАЙ ФАЙЛ `DictationApp.py`.**
+**CRITICAL: NEVER MODIFY OR REWRITE THE `DictationApp.py` FILE UNDER ANY CIRCUMSTANCES.**
 
-## 1. Запрет на редактирование кода
-Это локальное приложение для диктовки на базе Whisper. Оно очень хрупкое из-за системных разрешений macOS (Accessibility). Любое изменение файла `DictationApp.py` ломает подпись приложения, после чего macOS молча отзывает права на эмуляцию клавиатуры (приложение перестает печатать текст, хоть и распознает его).
-**Если пользователь просит запустить или починить диктовку, не пытайся рефакторить код.**
+## 1. Do Not Edit the Code
+This is a local Whisper-based dictation application. It is extremely fragile regarding macOS system permissions (Accessibility). Any modification to `DictationApp.py` breaks the application's signature, causing macOS to silently revoke keystroke emulation permissions (the app will recognize voice but fail to type text).
+**If the user asks you to start, fix, or install the dictation app, DO NOT attempt to refactor the code.**
 
-## 2. Запуск приложения
-- Всегда запускай только **ЭТУ стабильную версию** из текущей директории.
-- Не создавай дубликаты. Перед запуском всегда убивай старый процесс:
+## 2. Launching the App
+- Always run **THIS exact stable version** from the current directory.
+- Do not create duplicates. Always kill the old process before starting a new one:
   `pkill -f DictationApp.py`
-- Запускай приложение в фоне, чтобы оно не блокировало терминал, используй параметр `is_background: true` в run_shell_command, или `nohup`.
+- Run the application in the background so it doesn't block the terminal (use `is_background: true` in `run_shell_command`, or `nohup`).
 
-## 3. Решение проблем (Troubleshooting)
-- **Если текст не печатается:** Скажи пользователю зайти в **Системные настройки -> Конфиденциальность и безопасность -> Универсальный доступ (Accessibility)**, удалить терминал/python из списка (кнопкой `-`) и добавить заново (кнопкой `+`). Это необходимо из-за особенностей macOS при запуске скриптов, эмулирующих нажатия клавиш.
-- **Если отсутствует Swift helper:** Запусти скрипт `./build_and_install.sh`, он скомпилирует `paste_helper.swift` и положит его в `/tmp/paste_helper_type`.
+## 3. Troubleshooting
+- **If text is not being typed:** Tell the user to go to **System Settings -> Privacy & Security -> Accessibility**, remove their terminal/Python from the list (using the `-` button), and add it back (using the `+` button). This is required due to macOS security policies for scripts emulating keystrokes.
+- **If the Swift helper is missing:** Run the `./build_and_install.sh` script. It will compile `paste_helper.swift` and place it in `/tmp/paste_helper_type`.
 
-## 4. Обслуживание
-Не трогай логику MLX (очистка кэша `mlx.core.clear_cache()`), не меняй `pynput` бинды, не добавляй логгирование. Оставь всё как есть.
+## 4. Maintenance
+Do not touch the MLX logic (specifically the `mlx.core.clear_cache()` cleanup), do not change the `pynput` bindings, and do not add logging. Leave everything exactly as it is.
